@@ -59,7 +59,9 @@ const sketch = ({ context }) => {
 
       mask = 1.0 - mask;
 
-      gl_FragColor = vec4(vec3(mask), 1.0);
+      vec3 fragColor = mix(color, vec3(1.0), mask);
+
+      gl_FragColor = vec4(vec3(fragColor), 1.0);
     }
   `;
 
@@ -67,7 +69,7 @@ const sketch = ({ context }) => {
   const material = new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0 },
-      color: { value: new THREE.Color("#fff") },
+      color: { value: new THREE.Color("red") },
     },
     vertexShader,
     fragmentShader,
