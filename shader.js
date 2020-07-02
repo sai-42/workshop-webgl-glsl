@@ -8,6 +8,9 @@ const canvasSketch = require("canvas-sketch");
 const glsl = require("glslify");
 
 const settings = {
+  duration: 10,
+  fps: 60,
+  dimensions: [1080, 1080],
   // Make the loop animated
   animate: true,
   // Get a WebGL canvas rather than 2D
@@ -21,7 +24,7 @@ const sketch = ({ context }) => {
   });
 
   // WebGL background color
-  renderer.setClearColor("#000", 1);
+  renderer.setClearColor("#fff", 1);
 
   // Setup a camera
   const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 100);
@@ -125,7 +128,8 @@ const sketch = ({ context }) => {
       camera.updateProjectionMatrix();
     },
     // Update & render your scene here
-    render({ time }) {
+    render({ time, playhead }) {
+      mesh.rotation.y = playhead * Math.PI * 2;
       material.uniforms.time.value = time;
       controls.update();
       renderer.render(scene, camera);
