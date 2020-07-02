@@ -37,19 +37,22 @@ const sketch = ({ context }) => {
   // Setup a geometry
   const geometry = new THREE.SphereGeometry(1, 32, 16);
 
-  const baseGeom = new THREE.IcosahedronGeometry(1, 0);
+  const baseGeom = new THREE.IcosahedronGeometry(1, 1);
   const points = baseGeom.vertices;
+
+  const circleGeom = new THREE.CircleGeometry(1, 32);
 
   points.forEach((point) => {
     const mesh = new THREE.Mesh(
-      geometry,
+      circleGeom,
       new THREE.MeshBasicMaterial({
-        color: "red",
-        wireframe: true,
+        color: "black",
+        side: THREE.BackSide,
       })
     );
     mesh.position.copy(point);
-    mesh.scale.setScalar(0.15);
+    mesh.scale.setScalar(0.25 * Math.random());
+    mesh.lookAt(new THREE.Vector3());
     scene.add(mesh);
   });
 
