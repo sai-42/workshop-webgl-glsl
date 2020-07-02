@@ -40,11 +40,25 @@ const sketch = ({ context }) => {
   const baseGeom = new THREE.IcosahedronGeometry(1, 1);
   const points = baseGeom.vertices;
 
+  const circleGeom = new THREE.CircleGeometry(1, 32);
+
+  points.forEach((point) => {
+    const mesh = new THREE.Mesh(
+      circleGeom,
+      new THREE.MeshBasicMaterial({
+        color: "black",
+        side: THREE.BackSide,
+      })
+    );
+    mesh.position.copy(point);
+    mesh.scale.setScalar(0.25 * Math.random());
+    mesh.lookAt(new THREE.Vector3());
+    scene.add(mesh);
+  });
+
   const vertexShader = /* glsl */ `
     varying vec2 vUv;
-    varying vec3 vPosition;
     void main () {
-      vPosition = position;
       vUv = uv;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position.xyz, 1.0);
     }
@@ -53,38 +67,16 @@ const sketch = ({ context }) => {
   const fragmentShader = glsl(/* glsl */ `
     #pragma glslify: noise = require('glsl-noise/simplex/3d');
     varying vec2 vUv;
-    varying vec3 vPosition;
-
     uniform vec3 color;
     uniform float time;
-
-    uniform vec3 points[POINT_COUNT];
-
     void main () {
-      float dist = 10000.0;
-
-      for (int i = 0; i < POINT_COUNT; i++) {
-        vec3 p = points[i];
-        float d = distance(vPosition, p);
-        dist = min(d, dist);
-      }
-
-      float mask = step(0.15, dist);
-      mask = 1.0 - mask;
-
-      vec3 fragColor = mix(color, vec3(1.0), mask);
-
-      gl_FragColor = vec4(vec3(fragColor), 1.0);
+      gl_FragColor = vec4(vec3(color), 1.0);
     }
   `);
 
   // Setup a material
   const material = new THREE.ShaderMaterial({
-    defines: {
-      POINT_COUNT: points.length,
-    },
     uniforms: {
-      points: { value: points },
       time: { value: 0 },
       color: { value: new THREE.Color("red") },
     },
